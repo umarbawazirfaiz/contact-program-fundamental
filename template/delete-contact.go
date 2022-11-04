@@ -11,11 +11,15 @@ func DeleteContact() {
 	helper.ClearScreen()
 	fmt.Println("Delete Contact")
 	fmt.Println("===============")
-	var id int
-	fmt.Print("Input id yang akan di delete: ")
-	fmt.Scanln(&id)
-	contact, err := model.SearchById(&id)
+	var search string
+	fmt.Print("Input id/nama yang akan di delete: ")
+	fmt.Scanln(&search)
+	var contact model.Contact
+	err := controller.SearchContact(&contact, search)
 	if err != nil {
+		fmt.Println(err.Error())
+		var jeda string
+		fmt.Scanln(&jeda)
 		DeleteContact()
 	} else {
 		_, name, phone, email := contact.GetFields()

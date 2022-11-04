@@ -2,7 +2,9 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Contact struct {
@@ -28,14 +30,49 @@ func GetLastId() int {
 	}
 }
 
-func SearchById(id *int) (Contact, error) {
-	var contact Contact
-	for _, v := range Contacts {
-		if v.id == *id {
-			return v, nil
+func (c *Contact) SearchById(id *int) error {
+	foundContact := make(chan Contact)
+	defer close(foundContact)
+
+	go func() {
+		for _, v := range Contacts {
+			if v.id == *id {
+				fmt.Println(v)
+				foundContact <- v
+				return
+			}
 		}
+		foundContact <- *c
+	}()
+
+	*c = <-foundContact
+	if c.id == 0 {
+		return errors.New("data tidak ditemukan")
 	}
-	return contact, errors.New("data tidak ditemukan")
+
+	return nil
+}
+
+func (c *Contact) SearchByName(name *string) error {
+	foundContact := make(chan Contact)
+	defer close(foundContact)
+
+	go func() {
+		for _, v := range Contacts {
+			if strings.EqualFold(v.name, *name) {
+				foundContact <- v
+				return
+			}
+		}
+		foundContact <- *c
+	}()
+
+	*c = <-foundContact
+	if c.id == 0 {
+		return errors.New("data tidak ditemukan")
+	}
+
+	return nil
 }
 
 func GetIndex(id *int) (int, error) {
@@ -44,6 +81,7 @@ func GetIndex(id *int) (int, error) {
 			return i, nil
 		}
 	}
+
 	return 0, errors.New("Id " + strconv.Itoa(*id) + " tidak ditemukan")
 }
 
