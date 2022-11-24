@@ -1,7 +1,11 @@
 package main
 
-import "contact-program/template"
+import (
+	"contact-program/database"
+	"contact-program/template"
+)
 
 func main() {
-	template.Menu()
+	db := database.GetConnection()
+	template.Menu(db)
 }
