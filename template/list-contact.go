@@ -5,6 +5,8 @@ import (
 	"contact-program/helper"
 	"database/sql"
 	"fmt"
+
+	"github.com/buger/goterm"
 )
 
 type contactTemplate struct {
@@ -23,17 +25,22 @@ func (c *contactTemplate) ListContact() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("==========================================================")
-	fmt.Println("ID\tNama\t\tPhone\t\tEmail")
-	fmt.Println("==========================================================")
+
+	box := goterm.NewBox(100|goterm.PCT, (len(contacts)+1)*2-(len(contacts)-1), 0)
+	table := goterm.NewTable(0, 5, 1, ' ', 0)
+	fmt.Fprintf(table, "ID\t| Nama\t| Phone\t| Email\n")
 	if len(contacts) == 0 {
-		fmt.Println("Data kosong")
+		fmt.Fprintf(table, "Data kosong")
 	} else {
 		for _, v := range contacts {
-			fmt.Printf("%v\t%v\t\t%s\t\t%v\n", *v.GetId(), *v.GetName(), helper.PhoneToString(v.GetPhoneDatas()), *v.GetEmail())
+			fmt.Fprintf(table, "%v\t| %v\t| %s\t| %v\n", *v.GetId(), *v.GetName(), helper.PhoneToString(v.GetPhoneDatas()), *v.GetEmail())
 		}
 	}
-	fmt.Println("==========================================================")
+	fmt.Fprint(box, table)
+
+	fmt.Println("Data Contact")
+	fmt.Println(box)
+
 	helper.BackHandler()
 	Menu(c.db)
 }
