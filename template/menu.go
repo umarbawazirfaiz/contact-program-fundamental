@@ -11,9 +11,10 @@ import (
 
 func Menu(db *sql.DB) {
 	// Dependency Injection
-	contactRepository := repository.NewContactRepository(db)
+	// contactRepository := repository.NewContactRepository(db)
+	contactJsonRepository := repository.NewContactJsonRepository()
 	phoneRepository := repository.NewPhoneRepository(db)
-	contactHandler := handler.NewContactHandler(db, contactRepository, phoneRepository)
+	contactHandler := handler.NewContactHandler(db, contactJsonRepository, phoneRepository)
 	contactTemplate := NewContactTemplate(db, contactHandler)
 
 	helper.ClearScreen()

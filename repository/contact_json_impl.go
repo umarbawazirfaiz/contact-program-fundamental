@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -29,29 +30,45 @@ func (repo *contactJsonRepository) getLastId(ctx context.Context) (int, error) {
 }
 
 func (repo *contactJsonRepository) saveToJson(ctx context.Context, contacts *[]model.Contact) error {
-	file, err := os.Create("/database/json/contact.json")
+	file, err := os.Create("database/json/contact.json")
 	if err != nil {
 		return err
 	}
 
 	encoder := json.NewEncoder(file)
-	encoder.Encode(&contacts)
+
+	contactsJson := []model.ContactJson{}
+	for _, v := range *contacts {
+		contactJson := v.ToContactJson()
+		contactsJson = append(contactsJson, contactJson)
+	}
+
+	err = encoder.Encode(contactsJson)
+	if err != nil {
+		panic(err)
+	}
 
 	return nil
 }
 
 func (repo *contactJsonRepository) FindAll(ctx context.Context) ([]model.Contact, error) {
-	var contacts []model.Contact
+	var contactsJson []model.ContactJson
 
-	file, err := os.Open("databse/json/contact.json")
+	file, err := os.Open("database/json/contact.json")
 	if err != nil {
 		panic(err)
 	}
 
 	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&contacts)
+	err = decoder.Decode(&contactsJson)
 	if err != nil {
 		panic(err)
+	}
+
+	contacts := []model.Contact{}
+	for _, v := range contactsJson {
+		contact := v.ToContact()
+		contacts = append(contacts, contact)
 	}
 
 	return contacts, nil
@@ -63,13 +80,17 @@ func (repo *contactJsonRepository) Insert(ctx context.Context, contact model.Con
 		return contact, err
 	}
 
-	id, err := repo.getLastId(ctx)
+	lastId, err := repo.getLastId(ctx)
 	if err != nil {
 		return contact, err
 	}
+	id := lastId + 1
 	contact.SetId(&id)
 
+	fmt.Println(contact)
+
 	contacts = append(contacts, contact)
+	fmt.Println(contacts)
 
 	repo.saveToJson(ctx, &contacts)
 
