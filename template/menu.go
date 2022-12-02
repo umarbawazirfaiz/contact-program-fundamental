@@ -13,8 +13,9 @@ func Menu(db *sql.DB) {
 	// Dependency Injection
 	// contactRepository := repository.NewContactRepository(db)
 	contactJsonRepository := repository.NewContactJsonRepository()
-	phoneRepository := repository.NewPhoneRepository(db)
-	contactHandler := handler.NewContactHandler(db, contactJsonRepository, phoneRepository)
+	// phoneRepository := repository.NewPhoneRepository(db)
+	phoneJsonRepository := repository.NewPhoneJsonRepository()
+	contactHandler := handler.NewContactHandler(db, contactJsonRepository, phoneJsonRepository)
 	contactTemplate := NewContactTemplate(db, contactHandler)
 
 	helper.ClearScreen()

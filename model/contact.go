@@ -7,22 +7,6 @@ type Contact struct {
 	email      string `type:"email"`
 }
 
-type ContactJson struct {
-	Id    int
-	Name  string
-	Email string
-}
-
-func (contactJson *ContactJson) ToContact() Contact {
-	contact := Contact{
-		id:    contactJson.Id,
-		name:  contactJson.Name,
-		email: contactJson.Email,
-	}
-
-	return contact
-}
-
 func (contact *Contact) ToContactJson() ContactJson {
 	contactJson := ContactJson{
 		Id:    contact.id,

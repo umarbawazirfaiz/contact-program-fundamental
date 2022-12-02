@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -109,7 +110,7 @@ func (repo *contactJsonRepository) Delete(ctx context.Context, tx *sql.Tx, id in
 	}
 
 	for i, v := range contacts {
-		if v.GetId() == contact.GetId() {
+		if *v.GetId() == *contact.GetId() {
 			if i == 0 {
 				contacts = contacts[1:]
 			} else if len(contacts)-1 == i {
@@ -134,12 +135,12 @@ func (repo *contactJsonRepository) FindById(ctx context.Context, contact_id int)
 	}
 
 	for _, v := range contacts {
-		if v.GetId() == &contact_id {
-			contact = v
+		if *v.GetId() == contact_id {
+			return v, nil
 		}
 	}
 
-	return contact, nil
+	return contact, errors.New("data tidak ditemukan")
 }
 
 func (repo *contactJsonRepository) Update(ctx context.Context, tx *sql.Tx, contact model.Contact) (model.Contact, error) {

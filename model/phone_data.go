@@ -6,6 +6,14 @@ type PhoneData struct {
 	phone     string
 }
 
+func (phoneData *PhoneData) ToPhoneJson() PhoneDataJson {
+	return PhoneDataJson{
+		Id:        phoneData.id,
+		ContactId: phoneData.contactId,
+		Phone:     phoneData.phone,
+	}
+}
+
 func (phoneData *PhoneData) GetId() *int {
 	return &phoneData.id
 }
